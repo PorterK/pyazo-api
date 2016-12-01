@@ -4,7 +4,8 @@ const app = express();
 
 app.use('/api', api);
 
-//need to make it so that the directories (whatever they end up being) are served publically.
+app.use(express.static('screenshots'));
+
 //possibly create some sort of authentication so the client can communicate with the API (and other clients can't)
 
 app.listen(3000, (e) => {

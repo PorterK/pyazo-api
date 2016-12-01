@@ -3,25 +3,33 @@ const formidable = require('express-formidable');
 const path = require('path');
 const fs = require('fs');
 const _ = require('lodash');
-const router = express.Router();
 
+const config = require('./config');
+
+const router = express.Router();
 //all current comments are notes-to-self
 
 router.use(formidable({
   encoding: 'utf-8',
-  uploadDir: path.dirname('./i/*')
+  uploadDir: path.dirname('./screenshots/*')
 }));
 
 router.post('/', (req, res) => {
-  const filePath = req.files.image.path
+  if(req.files) {
+    const filePath = req.files.image.path
 
-  //shorten the filenames and move them to different paths soon
-  const newfilePath = `${_.replace(filePath, 'upload_', '')}.png`;
+    const newfilePath = `${_.replace(filePath, 'upload_', '')}.png`;
 
-  fs.rename(filePath, newfilePath);
+    const uploadURL = `http://${config.url}/${_.split(newfilePath, '/', 2)[1]}`
 
-  //send back the link to the image eventually.
-  res.send('Upload');
+    fs.rename(filePath, newfilePath);
+
+    console.log(`SCREENSHOT RECIEVED @ ${new Date()}: ${uploadURL}`);
+
+    res.send(uploadURL);
+  } else {
+    res.status(422).send('File not found or file type not supported.')
+  }
 });
 
 module.exports = router;
